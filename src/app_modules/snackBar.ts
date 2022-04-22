@@ -241,8 +241,9 @@ export class SnackBar {
     const { x: targetSnackBarElementContainerX } = targetSnackBarElementContainer.getBoundingClientRect();
     const touchPointShiftX = clientX - (targetSnackBarElementX - targetSnackBarElementContainerX);
     const swipeToCloseDistance = targetSnackBarElementWidth / 2;
+    let isCloseCondition = false;
 
-    const touchMoveHandler = this._throttle((event: TouchEvent): void => {
+    const touchMoveHandler = (event: TouchEvent): void => {
       const targetSnackBarElementTranslateX = Number(targetSnackBarElement.style.getPropertyValue('--translateX').replace('px', ''));
 
       document.body.style.overflow = 'hidden';
@@ -254,10 +255,11 @@ export class SnackBar {
         this._displayDurationPause(targetSnackBarElement);
       }
 
-      if (Math.abs(targetSnackBarElementTranslateX) > swipeToCloseDistance) {
+      if (!isCloseCondition && Math.abs(targetSnackBarElementTranslateX) > swipeToCloseDistance) {
+        isCloseCondition = true;
         this._delete(targetSnackBarElement, targetSnackBarOptions.onClose, true);
       }
-    }, 40);
+    };
 
     const touchEndHandler = (): void => {
       targetSnackBarElement.removeAttribute('data-dragging');
@@ -289,6 +291,7 @@ export class SnackBar {
     snackBarElement.dataset.isActive = 'false';
     snackBarElement.addEventListener('animationend', () => {
       snackBarElement.remove();
+      onCloseFunction();
       this._snackBarsOptions.delete(snackBarId);
       this._snackBarsTimeoutsId.delete(snackBarId);
       this._snackBarsIntervalsId.delete(snackBarId);
@@ -301,33 +304,5 @@ export class SnackBar {
         document.removeEventListener('visibilitychange', this._bindedOnFocusLossHandler);
       }
     });
-    onCloseFunction();
-  }
-
-  _throttle<Params extends any[]>(func: (...args: Params) => any, delay: number): (...args: Params) => void {
-    let isThrottle: boolean;
-    let lastFn: ReturnType<typeof setTimeout>;
-    let lastTime: number;
-
-    function wrapper (this: any, ...args: Params) {
-      // eslint-disable-next-line @typescript-eslint/no-this-alias
-      const savedThis = this;
-      const savedArgs = args;
-
-      if (!isThrottle) {
-        func.apply(savedThis, savedArgs);
-        lastTime = Date.now();
-        isThrottle = true;
-      } else {
-        clearTimeout(lastFn);
-        lastFn = setTimeout(() => {
-          if (Date.now() - lastTime >= delay) {
-            func.apply(savedThis, savedArgs);
-            lastTime = Date.now();
-          }
-        }, Math.max(delay - (Date.now() - lastTime), 0));
-      }
-    }
-    return wrapper;
   }
 }

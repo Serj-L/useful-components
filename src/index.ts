@@ -8,7 +8,7 @@ import {
 import './styles.scss';
 
 const changeThemeButton = document.getElementById('theme-switcher');
-const spinner = new Spinner({ size: 120, strokeWidth: 8, color: 'red' });
+const spinner = new Spinner({ size: 120, strokeWidth: 8, color: 'hsl(128, 42%, 47%)' });
 const scrollTop = new ScrollTop({ size: 24, triggerOffSet: 150, isLeftPosition: true, borderRadius: 6 });
 const themeSwithcher = new ThemeSwitcher ({ localStorageKeyName: 'testTheme', initialThemeType: 'dark' });
 const snackBarNotification = new SnackBar();
@@ -26,7 +26,7 @@ window.addEventListener('scroll', () => {
 
 changeThemeButton?.addEventListener('click', () => themeSwithcher.changeThemeType());
 
-snackBarNotification.create('Info', { position: 'top-left', autoClose: 30000, animationType: 'zoom', pauseOnHover: false });
+snackBarNotification.create('Info', { position: 'top-left', autoClose: 30000, animationType: 'zoom', pauseOnHover: false, onClose: () => console.log('Info snackBar closed') });
 setTimeout(() => {
   snackBarNotification.create('Warning', { type: 'warning', position: 'top-left', autoClose: 20000, animationType: 'flip', pauseOnFocusLoss: false });
 }, 2000);

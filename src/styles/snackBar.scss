@@ -1,0 +1,384 @@
+.snack-bar {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6em;
+  max-width: Min(370px, 90vw);
+  padding: 0.5em;
+  perspective: 50em;
+  z-index: 9999;
+
+  &[data-position^='top-'] {
+    top: 0;
+  }
+
+  &[data-position^='bottom-'] {
+    bottom: 0;
+  }
+
+  &[data-position$='-right'] {
+    right: 0;
+  }
+
+  &[data-position$='-left'] {
+    left: 0;
+  }
+
+  &__element {
+    --clr-snackBar-elements: hsl(224, 70%, 55%);
+    --slide-animation-direction-converter: 1;
+    --animation-duration: 0.5s;
+
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    font-size: var(--fontSize, 1.1rem);
+    color: var(--fontColor, hsl(0, 0%, 98%));
+    min-width: 250px;
+    border-radius: 6px;
+    background-color: var(--bgColor, hsl(233, 5%, 70%));
+    padding: 1.2em;
+    box-shadow: 0 4px 8px hsla(0, 0%, 0%, 0.25), 0 3px 3px hsla(0, 0%, 0%, 0.22);
+    overflow: hidden;
+
+    &[data-position='top-center'] {
+      --slide-animation-direction-converter: -1;
+    }
+
+    &[data-position$='-left'] {
+      --slide-animation-direction-converter: -1;
+    }
+
+    &[data-dragging] {
+      transform: translateX(var(--translateX));
+      opacity: var(--opacity);
+    }
+
+    &[data-is-active='true'] {
+      &[data-animation='bounce'] {
+        &[data-position$='-center'] {
+          animation: verticalBounce var(--animation-duration);
+        }
+        &[data-position$='-right'],
+        &[data-position$='-left'] {
+          animation: horizontalBounce var(--animation-duration);
+        }
+      }
+
+      &[data-animation='slide'] {
+        &[data-position$='-center'] {
+          animation: verticalSlide var(--animation-duration);
+        }
+        &[data-position$='-right'],
+        &[data-position$='-left'] {
+          animation: horizontalSlide var(--animation-duration);
+        }
+      }
+
+      &[data-animation='zoom'] {
+        animation: zoom var(--animation-duration);
+      }
+
+      &[data-animation='flip'] {
+        animation: flip var(--animation-duration);
+      }
+    }
+
+    &[data-is-active='false'].snack-bar__element:not(.snack-bar__element[data-swipe-close]) {
+      &[data-animation='bounce'] {
+        &[data-position$='-center'] {
+          animation: verticalBounceReverse var(--animation-duration);
+        }
+        &[data-position$='-right'],
+        &[data-position$='-left'] {
+          animation: horizontalBounceReverse var(--animation-duration);
+        }
+      }
+
+      &[data-animation='slide'] {
+        &[data-position$='-center'] {
+          animation: verticalSlideReverse var(--animation-duration);
+        }
+        &[data-position$='-right'],
+        &[data-position$='-left'] {
+          animation: horizontalSlideReverse var(--animation-duration);
+        }
+      }
+
+      &[data-animation='zoom'] {
+        animation: zoomReverse var(--animation-duration);
+      }
+
+      &[data-animation='flip'] {
+        animation: flipReverse var(--animation-duration);
+      }
+    }
+
+    &[data-swipe-close] {
+      animation: swipeClose 0.2s;
+    }
+
+    &[data-type='success'] {
+      --clr-snackBar-elements: hsl(128, 42%, 47%);
+    }
+
+    &[data-type='warning'] {
+      --clr-snackBar-elements: hsl(48, 89%, 50%);
+    }
+
+    &[data-type='error'] {
+      --clr-snackBar-elements: hsl(0, 70%, 55%);
+    }
+
+    &[data-close-on-click='true'] {
+      cursor: pointer;
+
+      &:hover .snack-bar__close-icon {
+        @media (hover: hover) and (pointer: fine) {
+          color: hsl(0, 70%, 55%);
+        }
+      }
+    }
+
+    &[data-show-progress-bar='true']::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: calc(100% * var(--progress));
+      height: 6px;
+      background-color: var(--clr-snackBar-elements);
+    }
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 1.2em;
+    height: 1.2em;
+    color: var(--clr-snackBar-elements);
+  }
+
+  &__message {
+    line-height: 1.1;
+  }
+
+  &__close-icon {
+    display: block;
+    position: absolute;
+    top: 0.3em;
+    right: 0.3em;
+    font-size: 1.7em;
+    font-weight: bold;
+    line-height: 0.5;
+    transition: color 0.2s ease-in-out;
+    cursor: pointer;
+
+    &:hover {
+      @media (hover: hover) and (pointer: fine) {
+        color: hsl(0, 70%, 55%);
+      }
+    }
+  }
+}
+
+/* animation */
+@keyframes horizontalSlide {
+  0% {
+    transform: translateX(calc(150% * var(--slide-animation-direction-converter)));
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(calc(0 * var(--slide-animation-direction-converter)));
+  }
+}
+@keyframes horizontalSlideReverse {
+  0% {
+    transform: translateX(calc(0 * var(--slide-animation-direction-converter)));
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(calc(150% * var(--slide-animation-direction-converter)));
+    opacity: 0;
+  }
+}
+
+@keyframes horizontalBounce {
+  0% {
+    transform: translateX(calc(150% * var(--slide-animation-direction-converter)));
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(calc(-10% * var(--slide-animation-direction-converter)));
+  }
+  75% {
+    transform: translateX(calc(8% * var(--slide-animation-direction-converter)));
+  }
+  85% {
+    transform: translateX(calc(-2% * var(--slide-animation-direction-converter)));
+  }
+  100% {
+    transform: translateX(calc(0 * var(--slide-animation-direction-converter)));
+  }
+}
+@keyframes horizontalBounceReverse {
+  0% {
+    transform: translateX(calc(0 * var(--slide-animation-direction-converter)));
+  }
+  15% {
+    transform: translateX(calc(-2% * var(--slide-animation-direction-converter)));
+  }
+  25% {
+    transform: translateX(calc(8% * var(--slide-animation-direction-converter)));
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(calc(-10% * var(--slide-animation-direction-converter)));
+  }
+  100% {
+    transform: translateX(calc(150% * var(--slide-animation-direction-converter)));
+    opacity: 0;
+  }
+}
+
+@keyframes verticalSlide {
+  0% {
+    transform: translateY(calc(150% * var(--slide-animation-direction-converter)));
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(0 * var(--slide-animation-direction-converter)));
+  }
+}
+@keyframes verticalSlideReverse {
+  0% {
+    transform: translateY(calc(0 * var(--slide-animation-direction-converter)));
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(150% * var(--slide-animation-direction-converter)));
+    opacity: 0;
+  }
+}
+
+@keyframes verticalBounce {
+  0% {
+    transform: translateY(calc(150% * var(--slide-animation-direction-converter)));
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(calc(-10% * var(--slide-animation-direction-converter)));
+
+  }
+  75% {
+    transform: translateY(calc(8% * var(--slide-animation-direction-converter)));
+  }
+  85% {
+    transform: translateY(calc(-2% * var(--slide-animation-direction-converter)));
+  }
+  100% {
+    transform: translateY(calc(0 * var(--slide-animation-direction-converter)));
+  }
+}
+@keyframes verticalBounceReverse {
+  0% {
+    transform: translateY(calc(0 * var(--slide-animation-direction-converter)));
+  }
+  15% {
+    transform: translateY(calc(-2% * var(--slide-animation-direction-converter)));
+  }
+  25% {
+    transform: translateY(calc(8% * var(--slide-animation-direction-converter)));
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(calc(-10% * var(--slide-animation-direction-converter)));
+
+  }
+  100% {
+    transform: translateY(calc(150% * var(--slide-animation-direction-converter)));
+    opacity: 0;
+  }
+}
+
+@keyframes zoom {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes zoomReverse {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    opacity: 1;
+  }
+ 100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes flip {
+  0% {
+    transform: rotate3d(1, 0, 0, 90deg);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  65% {
+    transform: rotate3d(1, 0, 0, -50deg);
+  }
+  100% {
+    transform: rotate3d(1, 0, 0, 0deg);
+  }
+}
+@keyframes flipReverse {
+  0% {
+    transform: rotate3d(1, 0, 0, 0deg);
+  }
+  35% {
+    transform: rotate3d(1, 0, 0, -50deg);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate3d(1, 0, 0, 90deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swipeClose {
+  0% {
+    transform: scale(1);
+    opacity: 0;
+  }
+ 100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}

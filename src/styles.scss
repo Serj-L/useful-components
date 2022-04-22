@@ -1,0 +1,26 @@
+@import './styles/normalize';
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@200;400;600&display=swap');
+@import './styles/commonVariables';
+
+*,
+*::before,
+::after {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  $transition: 0.2s;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  height: 200vh;
+}
+
+@import './styles/scrollTop';
+@import './styles/snackBar';
+@import './styles/spinner';
